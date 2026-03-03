@@ -2,10 +2,10 @@ package com.use_management_system.user_management.controller;
 
 import com.use_management_system.user_management.entity.Permission;
 import com.use_management_system.user_management.service.PermissionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +13,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/permissions")
-@RequiredArgsConstructor
 public class PermissionController {
 
     private final PermissionService permissionService;
+
+    public PermissionController(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
 
     @PostMapping
     public ResponseEntity<Permission> createPermission(@RequestBody Map<String, String> request) {

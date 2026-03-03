@@ -7,18 +7,25 @@ import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.repository.SessionRepository;
 import com.use_management_system.user_management.repository.UserRepository;
 import com.use_management_system.user_management.util.TokenUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 
 @Service
-@RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public AuthenticationService(UserRepository userRepository,
+                                 SessionRepository sessionRepository,
+                                 PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.sessionRepository = sessionRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public LoginResponse login(LoginRequest request, String ipAddress, String userAgent) {
         User user = userRepository.findByUsernameAndActive(request.getUsername(), true)

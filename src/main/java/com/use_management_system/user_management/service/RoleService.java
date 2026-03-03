@@ -6,19 +6,25 @@ import com.use_management_system.user_management.entity.UserRole;
 import com.use_management_system.user_management.repository.RoleRepository;
 import com.use_management_system.user_management.repository.UserRepository;
 import com.use_management_system.user_management.repository.UserRoleRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class RoleService {
 
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+
+    public RoleService(RoleRepository roleRepository,
+                       UserRepository userRepository,
+                       UserRoleRepository userRoleRepository) {
+        this.roleRepository = roleRepository;
+        this.userRepository = userRepository;
+        this.userRoleRepository = userRoleRepository;
+    }
 
     public Role createRole(String roleName, String description) {
         if (roleRepository.findByRoleName(roleName).isPresent()) {

@@ -1,9 +1,6 @@
 package com.use_management_system.user_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -11,9 +8,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "sessions")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Session {
 
     @Id
@@ -46,6 +40,81 @@ public class Session {
 
     @Column(nullable = false)
     private Boolean active = true;
+
+    public Session() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public String getSessionToken() {
+        return sessionToken;
+    }
+
+    public void setSessionToken(String sessionToken) {
+        this.sessionToken = sessionToken;
+    }
+
+    public String getIpAddress() {
+        return ipAddress;
+    }
+
+    public void setIpAddress(String ipAddress) {
+        this.ipAddress = ipAddress;
+    }
+
+    public String getUserAgent() {
+        return userAgent;
+    }
+
+    public void setUserAgent(String userAgent) {
+        this.userAgent = userAgent;
+    }
+
+    public LocalDateTime getLoginAt() {
+        return loginAt;
+    }
+
+    public void setLoginAt(LocalDateTime loginAt) {
+        this.loginAt = loginAt;
+    }
+
+    public LocalDateTime getLastActivityAt() {
+        return lastActivityAt;
+    }
+
+    public void setLastActivityAt(LocalDateTime lastActivityAt) {
+        this.lastActivityAt = lastActivityAt;
+    }
+
+    public LocalDateTime getLogoutAt() {
+        return logoutAt;
+    }
+
+    public void setLogoutAt(LocalDateTime logoutAt) {
+        this.logoutAt = logoutAt;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
 
     @PrePersist
     protected void onCreate() {

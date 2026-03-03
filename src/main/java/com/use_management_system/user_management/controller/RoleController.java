@@ -2,10 +2,10 @@ package com.use_management_system.user_management.controller;
 
 import com.use_management_system.user_management.entity.Role;
 import com.use_management_system.user_management.service.RoleService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,10 +13,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/roles")
-@RequiredArgsConstructor
 public class RoleController {
 
     private final RoleService roleService;
+
+    public RoleController(RoleService roleService) {
+        this.roleService = roleService;
+    }
 
     @PostMapping
     public ResponseEntity<Role> createRole(@RequestBody Map<String, String> request) {

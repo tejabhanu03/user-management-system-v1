@@ -6,19 +6,26 @@ import com.use_management_system.user_management.entity.RolePermission;
 import com.use_management_system.user_management.repository.PermissionRepository;
 import com.use_management_system.user_management.repository.RolePermissionRepository;
 import com.use_management_system.user_management.repository.RoleRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.util.List;
-import java.util.stream.Collectors;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 public class PermissionService {
 
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final RoleRepository roleRepository;
+
+    public PermissionService(PermissionRepository permissionRepository,
+                             RolePermissionRepository rolePermissionRepository,
+                             RoleRepository roleRepository) {
+        this.permissionRepository = permissionRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
+        this.roleRepository = roleRepository;
+    }
 
     public Permission createPermission(String permissionName, String description) {
         if (permissionRepository.findByPermissionName(permissionName).isPresent()) {

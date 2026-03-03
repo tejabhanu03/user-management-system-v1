@@ -2,10 +2,10 @@ package com.use_management_system.user_management.controller;
 
 import com.use_management_system.user_management.entity.Session;
 import com.use_management_system.user_management.service.SessionService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -13,10 +13,13 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/sessions")
-@RequiredArgsConstructor
 public class SessionController {
 
     private final SessionService sessionService;
+
+    public SessionController(SessionService sessionService) {
+        this.sessionService = sessionService;
+    }
 
     @GetMapping("/user/{userId}/active")
     public ResponseEntity<List<Session>> getUserActiveSessions(@PathVariable String userId) {

@@ -4,18 +4,22 @@ import com.use_management_system.user_management.entity.Session;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.repository.SessionRepository;
 import com.use_management_system.user_management.repository.UserRepository;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 public class SessionService {
 
     private final SessionRepository sessionRepository;
     private final UserRepository userRepository;
+
+    public SessionService(SessionRepository sessionRepository, UserRepository userRepository) {
+        this.sessionRepository = sessionRepository;
+        this.userRepository = userRepository;
+    }
 
     public List<Session> getUserActiveSessions(UUID userId) {
         User user = userRepository.findById(userId)

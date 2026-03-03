@@ -3,19 +3,22 @@ package com.use_management_system.user_management.controller;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
 import com.use_management_system.user_management.service.UserService;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
-@RequiredArgsConstructor
 public class UserController {
 
     private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("/register")
     public ResponseEntity<UserResponse> registerUser(@RequestBody UserRegistrationRequest request) {

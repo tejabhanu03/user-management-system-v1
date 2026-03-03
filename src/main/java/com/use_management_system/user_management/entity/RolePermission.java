@@ -1,9 +1,6 @@
 package com.use_management_system.user_management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.UuidGenerator;
 
 import java.time.LocalDateTime;
@@ -11,9 +8,6 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "role_permissions")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class RolePermission {
 
     @Id
@@ -35,6 +29,49 @@ public class RolePermission {
 
     @Column(name = "assigned_at", nullable = false, updatable = false)
     private LocalDateTime assignedAt;
+
+    public RolePermission() {
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
+    public Role getRole() {
+        return role;
+    }
+
+    public void setRole(Role role) {
+        this.role = role;
+    }
+
+    public Permission getPermission() {
+        return permission;
+    }
+
+    public void setPermission(Permission permission) {
+        this.permission = permission;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
+    }
+
+    public LocalDateTime getAssignedAt() {
+        return assignedAt;
+    }
+
+    public void setAssignedAt(LocalDateTime assignedAt) {
+        this.assignedAt = assignedAt;
+    }
 
     @PrePersist
     protected void onCreate() {

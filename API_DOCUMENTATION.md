@@ -24,7 +24,22 @@ http://localhost:8080/api
   "password": "string"
 }
 ```
-- Response: LoginResponse with session token
+- Response: LoginResponse with session token, JWT, roles, and permissions
+
+Example response:
+
+```json
+{
+  "userId": "uuid",
+  "username": "john_doe",
+  "email": "john@example.com",
+  "sessionToken": "session-token",
+  "jwtToken": "jwt-token",
+  "roles": ["ADMIN"],
+  "permissions": ["user.read", "user.write"],
+  "message": "Login successful"
+}
+```
 
 ### Logout
 - **POST** `/auth/logout`
@@ -35,6 +50,25 @@ http://localhost:8080/api
 - **GET** `/auth/validate`
 - Headers: `Authorization: Bearer <sessionToken>`
 - Response: `{ "valid": boolean }`
+
+> Note: For microservice-to-microservice communication, the recommended approach is to rely on the `jwtToken` instead of session validation.
+
+## User Context Endpoint (for Microservices)
+
+- **GET** `/user-context/me`
+- Headers: `Authorization: Bearer <jwtToken>`
+- Description: Returns the current authenticated user's context (identity, roles, and permissions) based on the JWT.
+
+Example response:
+
+```json
+{
+  "userId": "uuid",
+  "username": "john_doe",
+  "roles": ["ADMIN"],
+  "permissions": ["user.read", "user.write"]
+}
+```
 
 ## User Endpoints
 

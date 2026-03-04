@@ -20,6 +20,14 @@ spring:
     baselineOnMigrate: true
     outOfOrder: false
 
+security:
+  jwt:
+    # NOTE: Replace this with a strong value via environment-specific config before production use.
+    secret: "change-me-in-production-please-change-me-in-production"
+    issuer: "user-management-service"
+    audience: "internal-services"
+    expiration-minutes: 60
+
 server:
   port: 8080
   servlet:

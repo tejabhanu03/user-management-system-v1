@@ -2,10 +2,16 @@ package com.use_management_system.user_management.service;
 
 import com.use_management_system.user_management.dto.LoginRequest;
 import com.use_management_system.user_management.dto.LoginResponse;
+import com.use_management_system.user_management.dto.UserContextDto;
+import com.use_management_system.user_management.entity.RolePermission;
 import com.use_management_system.user_management.entity.Session;
 import com.use_management_system.user_management.entity.User;
+import com.use_management_system.user_management.entity.UserRole;
+import com.use_management_system.user_management.repository.RolePermissionRepository;
 import com.use_management_system.user_management.repository.SessionRepository;
 import com.use_management_system.user_management.repository.UserRepository;
+import com.use_management_system.user_management.repository.UserRoleRepository;
+import com.use_management_system.user_management.util.JwtTokenUtil;
 import com.use_management_system.user_management.util.TokenUtil;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -17,14 +23,23 @@ public class AuthenticationService {
 
     private final UserRepository userRepository;
     private final SessionRepository sessionRepository;
+    private final UserRoleRepository userRoleRepository;
+    private final RolePermissionRepository rolePermissionRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtTokenUtil jwtTokenUtil;
 
     public AuthenticationService(UserRepository userRepository,
                                  SessionRepository sessionRepository,
-                                 PasswordEncoder passwordEncoder) {
+                                 UserRoleRepository userRoleRepository,
+                                 RolePermissionRepository rolePermissionRepository,
+                                 PasswordEncoder passwordEncoder,
+                                 JwtTokenUtil jwtTokenUtil) {
         this.userRepository = userRepository;
         this.sessionRepository = sessionRepository;
+        this.userRoleRepository = userRoleRepository;
+        this.rolePermissionRepository = rolePermissionRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtTokenUtil = jwtTokenUtil;
     }
 
     public LoginResponse login(LoginRequest request, String ipAddress, String userAgent) {
@@ -37,7 +52,8 @@ public class AuthenticationService {
 
         String sessionToken = TokenUtil.generateToken();
 
-        Session session = new Session();
+        com.use_management_system.user_management.entity.Session session =
+                new com.use_management_system.user_management.entity.Session();
         session.setUser(user);
         session.setSessionToken(sessionToken);
         session.setIpAddress(ipAddress);
@@ -46,11 +62,17 @@ public class AuthenticationService {
 
         sessionRepository.save(session);
 
+        UserContextDto userContext = buildUserContext(user);
+        String jwtToken = jwtTokenUtil.generateToken(userContext);
+
         return new LoginResponse(
                 user.getId(),
                 user.getUsername(),
                 user.getEmail(),
                 sessionToken,
+                jwtToken,
+                userContext.getRoles(),
+                userContext.getPermissions(),
                 "Login successful"
         );
     }
@@ -82,6 +104,32 @@ public class AuthenticationService {
         sessionRepository.save(session);
 
         return session.getUser();
+    }
+
+    private UserContextDto buildUserContext(User user) {
+        var activeUserRoles = userRoleRepository.findByUserAndActive(user, true);
+
+        var roles = activeUserRoles.stream()
+                .map(UserRole::getRole)
+                .filter(role -> Boolean.TRUE.equals(role.getActive()))
+                .map(role -> role.getRoleName().toUpperCase())
+                .distinct()
+                .toList();
+
+        var permissions = activeUserRoles.stream()
+                .flatMap(userRole -> rolePermissionRepository.findByRoleAndActive(userRole.getRole(), true).stream())
+                .map(RolePermission::getPermission)
+                .filter(permission -> Boolean.TRUE.equals(permission.getActive()))
+                .map(permission -> permission.getPermissionName())
+                .distinct()
+                .toList();
+
+        return new UserContextDto(
+                user.getId(),
+                user.getUsername(),
+                roles,
+                permissions
+        );
     }
 }
 

@@ -2,10 +2,8 @@ package com.use_management_system.user_management.config;
 
 import com.use_management_system.user_management.util.JwtTokenUtil;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.Authentication;
@@ -29,9 +27,11 @@ import java.util.stream.Stream;
  * Example security configuration that downstream Spring Boot services can copy or extract
  * into a shared module. It validates JWTs issued by the user-management service and exposes
  * authorities based on roles and permissions.
+ *
+ * NOTE: This class is intentionally NOT annotated with @Configuration because this project
+ * already has an active SecurityConfig. Keeping both active would register two any-request
+ * filter chains and fail startup.
  */
-@Configuration
-@EnableMethodSecurity
 public class UserContextSecurityConfigTemplate {
 
     @Bean
@@ -96,4 +96,3 @@ public class UserContextSecurityConfigTemplate {
         }
     }
 }
-

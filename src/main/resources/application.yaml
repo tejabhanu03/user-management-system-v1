@@ -23,7 +23,7 @@ spring:
 security:
   jwt:
     # NOTE: Replace this with a strong value via environment-specific config before production use.
-    secret: "change-me-in-production-please-change-me-in-production"
+    secret: "nX7sV2fK9qLpR4mYtZ8wD3aHjU6eC1bNxT5rQvW2yP8kLmZ4s"
     issuer: "user-management-service"
     audience: "internal-services"
     expiration-minutes: 60

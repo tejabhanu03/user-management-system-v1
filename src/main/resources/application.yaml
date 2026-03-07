@@ -20,7 +20,7 @@ spring:
     baselineOnMigrate: true
     outOfOrder: false
   mail:
-    host: ${SPRING_MAIL_HOST:email-smtp.ap-south-1.amazonaws.com}
+    host: ${SPRING_MAIL_HOST:email-smtp.us-east-1.amazonaws.com}
     port: ${SPRING_MAIL_PORT:587}
     username: ${SES_SMTP_USERNAME:}
     password: ${SES_SMTP_PASSWORD:}
@@ -42,7 +42,7 @@ security:
 
 app:
   email:
-    from: ${APP_EMAIL_FROM:no-reply@example.com}
+    from: ${APP_EMAIL_FROM:tech.tejabhanu03@proton.me}
     verify-base-url: ${APP_EMAIL_VERIFY_BASE_URL:http://localhost:8080/api/auth/verify-email}
 
 server:

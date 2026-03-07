@@ -2,7 +2,11 @@ package com.use_management_system.user_management.controller;
 
 import com.use_management_system.user_management.dto.LoginRequest;
 import com.use_management_system.user_management.dto.LoginResponse;
+import com.use_management_system.user_management.dto.ResendVerificationRequest;
+import com.use_management_system.user_management.dto.VerificationResponse;
 import com.use_management_system.user_management.service.AuthenticationService;
+import com.use_management_system.user_management.service.EmailVerificationService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,22 +20,21 @@ import java.util.Map;
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
+    private final EmailVerificationService emailVerificationService;
 
-    public AuthenticationController(AuthenticationService authenticationService) {
+    public AuthenticationController(AuthenticationService authenticationService,
+                                    EmailVerificationService emailVerificationService) {
         this.authenticationService = authenticationService;
+        this.emailVerificationService = emailVerificationService;
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> login(@RequestBody LoginRequest request, HttpServletRequest servletRequest) {
-        try {
-            String ipAddress = getClientIp(servletRequest);
-            String userAgent = servletRequest.getHeader("User-Agent");
+        String ipAddress = getClientIp(servletRequest);
+        String userAgent = servletRequest.getHeader("User-Agent");
 
-            LoginResponse response = authenticationService.login(request, ipAddress, userAgent);
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-        }
+        LoginResponse response = authenticationService.login(request, ipAddress, userAgent);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/logout")
@@ -64,6 +67,21 @@ public class AuthenticationController {
         }
     }
 
+    @GetMapping("/verify-email")
+    public ResponseEntity<VerificationResponse> verifyEmail(@RequestParam("token") String token) {
+        VerificationResponse response = emailVerificationService.verifyEmail(token);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/resend-verification")
+    public ResponseEntity<Map<String, String>> resendVerification(@Valid @RequestBody ResendVerificationRequest request) {
+        emailVerificationService.resendVerificationEmail(request.getEmail());
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "If an account exists for this email, a verification link has been sent");
+        return ResponseEntity.ok(response);
+    }
+
     private String getClientIp(HttpServletRequest request) {
         String xForwardedFor = request.getHeader("X-Forwarded-For");
         if (xForwardedFor == null || xForwardedFor.isEmpty()) {
@@ -72,4 +90,3 @@ public class AuthenticationController {
         return xForwardedFor.split(",")[0].trim();
     }
 }
-

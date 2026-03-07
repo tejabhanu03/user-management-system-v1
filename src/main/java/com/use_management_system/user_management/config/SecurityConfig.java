@@ -47,6 +47,9 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/logout",
                                 "/api/auth/validate",
+                                "/api/auth/verify-email",
+                                "/api/auth/resend-verification",
+                                "/api/users/register",
                                 "/api/health",
                                 "/actuator/health"
                         ).permitAll()
@@ -107,4 +110,3 @@ public class SecurityConfig {
         }
     }
 }
-

@@ -31,6 +31,24 @@ public class User {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
+    @Column(name = "email_verified_at")
+    private LocalDateTime emailVerifiedAt;
+
+    @Column(name = "email_verification_version", nullable = false)
+    private Integer emailVerificationVersion = 0;
+
+    @Column(name = "verification_last_sent_at")
+    private LocalDateTime verificationLastSentAt;
+
+    @Column(name = "verification_resend_window_start")
+    private LocalDateTime verificationResendWindowStart;
+
+    @Column(name = "verification_resend_count", nullable = false)
+    private Integer verificationResendCount = 0;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -102,6 +120,54 @@ public class User {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public LocalDateTime getEmailVerifiedAt() {
+        return emailVerifiedAt;
+    }
+
+    public void setEmailVerifiedAt(LocalDateTime emailVerifiedAt) {
+        this.emailVerifiedAt = emailVerifiedAt;
+    }
+
+    public Integer getEmailVerificationVersion() {
+        return emailVerificationVersion;
+    }
+
+    public void setEmailVerificationVersion(Integer emailVerificationVersion) {
+        this.emailVerificationVersion = emailVerificationVersion;
+    }
+
+    public LocalDateTime getVerificationLastSentAt() {
+        return verificationLastSentAt;
+    }
+
+    public void setVerificationLastSentAt(LocalDateTime verificationLastSentAt) {
+        this.verificationLastSentAt = verificationLastSentAt;
+    }
+
+    public LocalDateTime getVerificationResendWindowStart() {
+        return verificationResendWindowStart;
+    }
+
+    public void setVerificationResendWindowStart(LocalDateTime verificationResendWindowStart) {
+        this.verificationResendWindowStart = verificationResendWindowStart;
+    }
+
+    public Integer getVerificationResendCount() {
+        return verificationResendCount;
+    }
+
+    public void setVerificationResendCount(Integer verificationResendCount) {
+        this.verificationResendCount = verificationResendCount;
     }
 
     @PrePersist

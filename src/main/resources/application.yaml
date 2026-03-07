@@ -19,6 +19,17 @@ spring:
     locations: classpath:db/migration
     baselineOnMigrate: true
     outOfOrder: false
+  mail:
+    host: ${SPRING_MAIL_HOST:email-smtp.ap-south-1.amazonaws.com}
+    port: ${SPRING_MAIL_PORT:587}
+    username: ${SES_SMTP_USERNAME:}
+    password: ${SES_SMTP_PASSWORD:}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 security:
   jwt:
@@ -27,6 +38,12 @@ security:
     issuer: "user-management-service"
     audience: "internal-services"
     expiration-minutes: 60
+    email-verification-expiration-minutes: 15
+
+app:
+  email:
+    from: ${APP_EMAIL_FROM:no-reply@example.com}
+    verify-base-url: ${APP_EMAIL_VERIFY_BASE_URL:http://localhost:8080/api/auth/verify-email}
 
 server:
   port: 8080
@@ -39,4 +56,3 @@ logging:
     com.use_management_system: DEBUG
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
-

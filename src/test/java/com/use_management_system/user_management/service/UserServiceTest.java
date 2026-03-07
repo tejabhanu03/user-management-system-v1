@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.dto.RegistrationResponse;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
 import com.use_management_system.user_management.entity.User;
@@ -20,7 +21,6 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -31,6 +31,9 @@ class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private EmailVerificationService emailVerificationService;
 
     @InjectMocks
     private UserService userService;
@@ -63,26 +66,26 @@ class UserServiceTest {
     void testRegisterUserSuccess() {
         // Arrange
         when(userRepository.findByUsername(registrationRequest.getUsername())).thenReturn(Optional.empty());
-        when(userRepository.findByEmail(registrationRequest.getEmail())).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase(registrationRequest.getEmail())).thenReturn(Optional.empty());
         when(passwordEncoder.encode(registrationRequest.getPassword())).thenReturn("hashedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // Act
-        UserResponse response = userService.registerUser(registrationRequest);
+        RegistrationResponse response = userService.registerUser(registrationRequest);
 
         // Assert
         assertNotNull(response);
-        assertEquals(testUser.getId(), response.getId());
+        assertEquals(testUser.getId(), response.getUserId());
         assertEquals(testUser.getUsername(), response.getUsername());
         assertEquals(testUser.getEmail(), response.getEmail());
-        assertEquals(testUser.getFullName(), response.getFullName());
-        assertTrue(response.getActive());
+        assertEquals("Registration successful. Please verify your email.", response.getMessage());
 
         // Verify interactions
         verify(userRepository, times(1)).findByUsername(registrationRequest.getUsername());
-        verify(userRepository, times(1)).findByEmail(registrationRequest.getEmail());
+        verify(userRepository, times(1)).findByEmailIgnoreCase(registrationRequest.getEmail());
         verify(passwordEncoder, times(1)).encode(registrationRequest.getPassword());
         verify(userRepository, times(1)).save(any(User.class));
+        verify(emailVerificationService, times(1)).sendVerificationForNewUser(any(User.class));
     }
 
     @Test
@@ -104,7 +107,7 @@ class UserServiceTest {
     void testRegisterUserWithExistingEmail() {
         // Arrange
         when(userRepository.findByUsername(registrationRequest.getUsername())).thenReturn(Optional.empty());
-        when(userRepository.findByEmail(registrationRequest.getEmail())).thenReturn(Optional.of(testUser));
+        when(userRepository.findByEmailIgnoreCase(registrationRequest.getEmail())).thenReturn(Optional.of(testUser));
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -113,7 +116,7 @@ class UserServiceTest {
 
         // Verify interactions
         verify(userRepository, times(1)).findByUsername(registrationRequest.getUsername());
-        verify(userRepository, times(1)).findByEmail(registrationRequest.getEmail());
+        verify(userRepository, times(1)).findByEmailIgnoreCase(registrationRequest.getEmail());
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -225,7 +228,7 @@ class UserServiceTest {
         updateRequest.setEmail("updated@example.com");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(userRepository.findByEmail("updated@example.com")).thenReturn(Optional.empty());
+        when(userRepository.findByEmailIgnoreCase("updated@example.com")).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
         // Act
@@ -234,7 +237,7 @@ class UserServiceTest {
         // Assert
         assertNotNull(response);
         verify(userRepository, times(1)).findById(userId);
-        verify(userRepository, times(1)).findByEmail("updated@example.com");
+        verify(userRepository, times(1)).findByEmailIgnoreCase("updated@example.com");
         verify(userRepository, times(1)).save(any(User.class));
     }
 
@@ -263,7 +266,7 @@ class UserServiceTest {
         existingUser.setEmail("existing@example.com");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(testUser));
-        when(userRepository.findByEmail("existing@example.com")).thenReturn(Optional.of(existingUser));
+        when(userRepository.findByEmailIgnoreCase("existing@example.com")).thenReturn(Optional.of(existingUser));
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
@@ -271,7 +274,7 @@ class UserServiceTest {
         assertEquals("Email already exists", exception.getMessage());
 
         verify(userRepository, times(1)).findById(userId);
-        verify(userRepository, times(1)).findByEmail("existing@example.com");
+        verify(userRepository, times(1)).findByEmailIgnoreCase("existing@example.com");
         verify(userRepository, never()).save(any(User.class));
     }
 
@@ -334,4 +337,3 @@ class UserServiceTest {
         verify(userRepository, never()).save(any(User.class));
     }
 }
-

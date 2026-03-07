@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.dto.RegistrationResponse;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
 import com.use_management_system.user_management.entity.User;
@@ -16,29 +17,52 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailVerificationService emailVerificationService;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder,
+                       EmailVerificationService emailVerificationService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.emailVerificationService = emailVerificationService;
     }
 
-    public UserResponse registerUser(UserRegistrationRequest request) {
-        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
+    public RegistrationResponse registerUser(UserRegistrationRequest request) {
+        validateRegistrationRequest(request);
+
+        String normalizedUsername = request.getUsername().trim();
+        String normalizedEmail = request.getEmail().trim().toLowerCase();
+        String normalizedFullName = request.getFullName().trim();
+
+        if (userRepository.findByUsername(normalizedUsername).isPresent()) {
             throw new RuntimeException("Username already exists");
         }
-        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
             throw new RuntimeException("Email already exists");
         }
 
         User user = new User();
-        user.setUsername(request.getUsername());
+        user.setUsername(normalizedUsername);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setEmail(request.getEmail());
-        user.setFullName(request.getFullName());
-        user.setActive(true);
+        user.setEmail(normalizedEmail);
+        user.setFullName(normalizedFullName);
+        user.setActive(false);
+        user.setEmailVerified(false);
+        user.setEmailVerifiedAt(null);
+        user.setEmailVerificationVersion(0);
+        user.setVerificationLastSentAt(null);
+        user.setVerificationResendWindowStart(null);
+        user.setVerificationResendCount(0);
 
         User savedUser = userRepository.save(user);
-        return mapToResponse(savedUser);
+        emailVerificationService.sendVerificationForNewUser(savedUser);
+
+        return new RegistrationResponse(
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                "Registration successful. Please verify your email."
+        );
     }
 
     public UserResponse getUserById(UUID userId) {
@@ -67,11 +91,12 @@ public class UserService {
         if (request.getFullName() != null) {
             user.setFullName(request.getFullName());
         }
-        if (request.getEmail() != null && !user.getEmail().equals(request.getEmail())) {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
+        if (request.getEmail() != null && !user.getEmail().equalsIgnoreCase(request.getEmail())) {
+            String normalizedEmail = request.getEmail().trim().toLowerCase();
+            if (userRepository.findByEmailIgnoreCase(normalizedEmail).isPresent()) {
                 throw new RuntimeException("Email already exists");
             }
-            user.setEmail(request.getEmail());
+            user.setEmail(normalizedEmail);
         }
 
         User updatedUser = userRepository.save(user);
@@ -99,8 +124,24 @@ public class UserService {
                 user.getEmail(),
                 user.getFullName(),
                 user.getActive(),
+                user.getEmailVerified(),
                 user.getCreatedAt(),
                 user.getUpdatedAt()
         );
+    }
+
+    private void validateRegistrationRequest(UserRegistrationRequest request) {
+        if (request.getUsername() == null || request.getUsername().trim().isEmpty()) {
+            throw new RuntimeException("Username is required");
+        }
+        if (request.getPassword() == null || request.getPassword().length() < 8) {
+            throw new RuntimeException("Password must be at least 8 characters");
+        }
+        if (request.getEmail() == null || !request.getEmail().contains("@")) {
+            throw new RuntimeException("Valid email is required");
+        }
+        if (request.getFullName() == null || request.getFullName().trim().isEmpty()) {
+            throw new RuntimeException("Full name is required");
+        }
     }
 }

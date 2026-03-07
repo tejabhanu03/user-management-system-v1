@@ -10,6 +10,7 @@ public class UserResponse {
     private String email;
     private String fullName;
     private Boolean active;
+    private Boolean emailVerified;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -17,12 +18,13 @@ public class UserResponse {
     }
 
     public UserResponse(UUID id, String username, String email, String fullName,
-                        Boolean active, LocalDateTime createdAt, LocalDateTime updatedAt) {
+                        Boolean active, Boolean emailVerified, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.active = active;
+        this.emailVerified = emailVerified;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
@@ -65,6 +67,14 @@ public class UserResponse {
 
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    public Boolean getEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(Boolean emailVerified) {
+        this.emailVerified = emailVerified;
     }
 
     public LocalDateTime getCreatedAt() {

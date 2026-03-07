@@ -10,4 +10,23 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
       ddl-auto: create-drop
+  flyway:
+    enabled: false
+  mail:
+    host: localhost
+    port: 2525
+    username: test
+    password: test
 
+security:
+  jwt:
+    secret: "nX7sV2fK9qLpR4mYtZ8wD3aHjU6eC1bNxT5rQvW2yP8kLmZ4s"
+    issuer: "user-management-service"
+    audience: "internal-services"
+    expiration-minutes: 60
+    email-verification-expiration-minutes: 15
+
+app:
+  email:
+    from: "no-reply@example.com"
+    verify-base-url: "http://localhost:8080/api/auth/verify-email"

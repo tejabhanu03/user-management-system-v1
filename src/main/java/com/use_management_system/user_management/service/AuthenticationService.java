@@ -7,6 +7,7 @@ import com.use_management_system.user_management.entity.RolePermission;
 import com.use_management_system.user_management.entity.Session;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.entity.UserRole;
+import com.use_management_system.user_management.exception.EmailVerificationRequiredException;
 import com.use_management_system.user_management.repository.RolePermissionRepository;
 import com.use_management_system.user_management.repository.SessionRepository;
 import com.use_management_system.user_management.repository.UserRepository;
@@ -43,11 +44,19 @@ public class AuthenticationService {
     }
 
     public LoginResponse login(LoginRequest request, String ipAddress, String userAgent) {
-        User user = userRepository.findByUsernameAndActive(request.getUsername(), true)
+        User user = userRepository.findByUsername(request.getUsername())
                 .orElseThrow(() -> new RuntimeException("Invalid username or password"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new RuntimeException("Invalid username or password");
+        }
+
+        if (!Boolean.TRUE.equals(user.getEmailVerified())) {
+            throw new EmailVerificationRequiredException();
+        }
+
+        if (!Boolean.TRUE.equals(user.getActive())) {
+            throw new RuntimeException("User account is inactive");
         }
 
         String sessionToken = TokenUtil.generateToken();
@@ -132,4 +141,3 @@ public class AuthenticationService {
         );
     }
 }
-

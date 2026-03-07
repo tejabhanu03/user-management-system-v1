@@ -1,10 +1,23 @@
 package com.use_management_system.user_management.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 public class UserRegistrationRequest {
 
+    @NotBlank(message = "username is required")
     private String username;
+
+    @NotBlank(message = "password is required")
+    @Size(min = 8, message = "password must be at least 8 characters")
     private String password;
+
+    @NotBlank(message = "email is required")
+    @Email(message = "email must be valid")
     private String email;
+
+    @NotBlank(message = "fullName is required")
     private String fullName;
 
     public UserRegistrationRequest() {
@@ -49,4 +62,3 @@ public class UserRegistrationRequest {
         this.fullName = fullName;
     }
 }
-

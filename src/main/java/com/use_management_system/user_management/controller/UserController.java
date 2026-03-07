@@ -1,8 +1,10 @@
 package com.use_management_system.user_management.controller;
 
+import com.use_management_system.user_management.dto.RegistrationResponse;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
 import com.use_management_system.user_management.service.UserService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,13 +23,9 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<UserResponse> registerUser(@RequestBody UserRegistrationRequest request) {
-        try {
-            UserResponse response = userService.registerUser(request);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-        }
+    public ResponseEntity<RegistrationResponse> registerUser(@Valid @RequestBody UserRegistrationRequest request) {
+        RegistrationResponse response = userService.registerUser(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/{userId}")

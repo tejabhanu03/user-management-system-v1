@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.Permission;
 import com.use_management_system.user_management.entity.Role;
 import com.use_management_system.user_management.entity.RolePermission;
@@ -18,23 +19,28 @@ public class PermissionService {
     private final PermissionRepository permissionRepository;
     private final RolePermissionRepository rolePermissionRepository;
     private final RoleRepository roleRepository;
+    private final ClientService clientService;
 
     public PermissionService(PermissionRepository permissionRepository,
                              RolePermissionRepository rolePermissionRepository,
-                             RoleRepository roleRepository) {
+                             RoleRepository roleRepository,
+                             ClientService clientService) {
         this.permissionRepository = permissionRepository;
         this.rolePermissionRepository = rolePermissionRepository;
         this.roleRepository = roleRepository;
+        this.clientService = clientService;
     }
 
-    public Permission createPermission(String permissionName, String description) {
+    public Permission createPermission(String permissionName, String description, UUID clientId) {
         if (permissionRepository.findByPermissionName(permissionName).isPresent()) {
             throw new RuntimeException("Permission already exists");
         }
 
         Permission permission = new Permission();
+        Client client = clientService.resolveClient(clientId);
         permission.setPermissionName(permissionName);
         permission.setDescription(description);
+        permission.setClient(client);
         permission.setActive(true);
 
         return permissionRepository.save(permission);

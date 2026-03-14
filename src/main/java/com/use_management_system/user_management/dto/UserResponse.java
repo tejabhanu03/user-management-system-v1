@@ -6,6 +6,7 @@ import java.util.UUID;
 public class UserResponse {
 
     private UUID id;
+    private UUID clientId;
     private String username;
     private String email;
     private String fullName;
@@ -17,9 +18,10 @@ public class UserResponse {
     public UserResponse() {
     }
 
-    public UserResponse(UUID id, String username, String email, String fullName,
+    public UserResponse(UUID id, UUID clientId, String username, String email, String fullName,
                         Boolean active, Boolean emailVerified, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
+        this.clientId = clientId;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
@@ -35,6 +37,14 @@ public class UserResponse {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public UUID getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(UUID clientId) {
+        this.clientId = clientId;
     }
 
     public String getUsername() {

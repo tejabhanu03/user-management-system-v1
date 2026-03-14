@@ -3,6 +3,7 @@ package com.use_management_system.user_management.service;
 import com.use_management_system.user_management.dto.RegistrationResponse;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -18,13 +19,16 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailVerificationService emailVerificationService;
+    private final ClientService clientService;
 
     public UserService(UserRepository userRepository,
                        PasswordEncoder passwordEncoder,
-                       EmailVerificationService emailVerificationService) {
+                       EmailVerificationService emailVerificationService,
+                       ClientService clientService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.emailVerificationService = emailVerificationService;
+        this.clientService = clientService;
     }
 
     public RegistrationResponse registerUser(UserRegistrationRequest request) {
@@ -42,10 +46,12 @@ public class UserService {
         }
 
         User user = new User();
+        Client client = clientService.resolveClient(request.getClientId());
         user.setUsername(normalizedUsername);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setEmail(normalizedEmail);
         user.setFullName(normalizedFullName);
+        user.setClient(client);
         user.setActive(false);
         user.setEmailVerified(false);
         user.setEmailVerifiedAt(null);
@@ -59,6 +65,7 @@ public class UserService {
 
         return new RegistrationResponse(
                 savedUser.getId(),
+                savedUser.getClient() == null ? null : savedUser.getClient().getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
                 "Registration successful. Please verify your email."
@@ -120,6 +127,7 @@ public class UserService {
     private UserResponse mapToResponse(User user) {
         return new UserResponse(
                 user.getId(),
+                user.getClient() == null ? null : user.getClient().getId(),
                 user.getUsername(),
                 user.getEmail(),
                 user.getFullName(),

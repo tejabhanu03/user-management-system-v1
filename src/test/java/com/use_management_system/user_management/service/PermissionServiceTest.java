@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.Permission;
 import com.use_management_system.user_management.entity.Role;
 import com.use_management_system.user_management.entity.RolePermission;
@@ -35,29 +36,42 @@ class PermissionServiceTest {
     @Mock
     private RoleRepository roleRepository;
 
+    @Mock
+    private ClientService clientService;
+
     @InjectMocks
     private PermissionService permissionService;
 
     private UUID permissionId;
     private UUID roleId;
+    private UUID clientId;
     private Permission testPermission;
     private Role testRole;
+    private Client testClient;
 
     @BeforeEach
     void setUp() {
         permissionId = UUID.randomUUID();
         roleId = UUID.randomUUID();
+        clientId = UUID.randomUUID();
+
+        testClient = new Client();
+        testClient.setId(clientId);
+        testClient.setClientName("DEFAULT_CLIENT");
+        testClient.setIsEnabled(true);
 
         testPermission = new Permission();
         testPermission.setId(permissionId);
         testPermission.setPermissionName("VIEW_USERS");
         testPermission.setDescription("Permission to view users");
+        testPermission.setClient(testClient);
         testPermission.setActive(true);
 
         testRole = new Role();
         testRole.setId(roleId);
         testRole.setRoleName("ADMIN");
         testRole.setDescription("Administrator role");
+        testRole.setClient(testClient);
         testRole.setActive(true);
     }
 
@@ -65,10 +79,11 @@ class PermissionServiceTest {
     void testCreatePermissionSuccess() {
         // Arrange
         when(permissionRepository.findByPermissionName("VIEW_USERS")).thenReturn(Optional.empty());
+        when(clientService.resolveClient(null)).thenReturn(testClient);
         when(permissionRepository.save(any(Permission.class))).thenReturn(testPermission);
 
         // Act
-        Permission createdPermission = permissionService.createPermission("VIEW_USERS", "Permission to view users");
+        Permission createdPermission = permissionService.createPermission("VIEW_USERS", "Permission to view users", null);
 
         // Assert
         assertNotNull(createdPermission);
@@ -77,6 +92,7 @@ class PermissionServiceTest {
         assertTrue(createdPermission.getActive());
 
         verify(permissionRepository, times(1)).findByPermissionName("VIEW_USERS");
+        verify(clientService, times(1)).resolveClient(null);
         verify(permissionRepository, times(1)).save(any(Permission.class));
     }
 
@@ -87,7 +103,7 @@ class PermissionServiceTest {
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> permissionService.createPermission("VIEW_USERS", "Permission to view users"));
+            () -> permissionService.createPermission("VIEW_USERS", "Permission to view users", null));
         assertEquals("Permission already exists", exception.getMessage());
 
         verify(permissionRepository, times(1)).findByPermissionName("VIEW_USERS");
@@ -348,4 +364,3 @@ class PermissionServiceTest {
         verify(rolePermissionRepository, never()).findByRoleAndActive(any(), any());
     }
 }
-

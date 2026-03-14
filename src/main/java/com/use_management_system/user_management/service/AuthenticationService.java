@@ -64,6 +64,7 @@ public class AuthenticationService {
         com.use_management_system.user_management.entity.Session session =
                 new com.use_management_system.user_management.entity.Session();
         session.setUser(user);
+        session.setClient(user.getClient());
         session.setSessionToken(sessionToken);
         session.setIpAddress(ipAddress);
         session.setUserAgent(userAgent);
@@ -135,6 +136,7 @@ public class AuthenticationService {
 
         return new UserContextDto(
                 user.getId(),
+                user.getClient() == null ? null : user.getClient().getId(),
                 user.getUsername(),
                 roles,
                 permissions

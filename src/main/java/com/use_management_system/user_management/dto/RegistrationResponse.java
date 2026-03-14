@@ -5,6 +5,7 @@ import java.util.UUID;
 public class RegistrationResponse {
 
     private UUID userId;
+    private UUID clientId;
     private String username;
     private String email;
     private String message;
@@ -12,8 +13,9 @@ public class RegistrationResponse {
     public RegistrationResponse() {
     }
 
-    public RegistrationResponse(UUID userId, String username, String email, String message) {
+    public RegistrationResponse(UUID userId, UUID clientId, String username, String email, String message) {
         this.userId = userId;
+        this.clientId = clientId;
         this.username = username;
         this.email = email;
         this.message = message;
@@ -25,6 +27,14 @@ public class RegistrationResponse {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public UUID getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(UUID clientId) {
+        this.clientId = clientId;
     }
 
     public String getUsername() {

@@ -3,6 +3,7 @@ package com.use_management_system.user_management.service;
 import com.use_management_system.user_management.dto.RegistrationResponse;
 import com.use_management_system.user_management.dto.UserRegistrationRequest;
 import com.use_management_system.user_management.dto.UserResponse;
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -35,22 +36,35 @@ class UserServiceTest {
     @Mock
     private EmailVerificationService emailVerificationService;
 
+    @Mock
+    private ClientService clientService;
+
     @InjectMocks
     private UserService userService;
 
     private UUID userId;
+    private UUID clientId;
     private User testUser;
+    private Client testClient;
     private UserRegistrationRequest registrationRequest;
 
     @BeforeEach
     void setUp() {
         userId = UUID.randomUUID();
+        clientId = UUID.randomUUID();
+
+        testClient = new Client();
+        testClient.setId(clientId);
+        testClient.setClientName("DEFAULT_CLIENT");
+        testClient.setIsEnabled(true);
+
         testUser = new User();
         testUser.setId(userId);
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
         testUser.setPassword("hashedPassword123");
         testUser.setFullName("Test User");
+        testUser.setClient(testClient);
         testUser.setActive(true);
         testUser.setCreatedAt(LocalDateTime.now());
         testUser.setUpdatedAt(LocalDateTime.now());
@@ -67,6 +81,7 @@ class UserServiceTest {
         // Arrange
         when(userRepository.findByUsername(registrationRequest.getUsername())).thenReturn(Optional.empty());
         when(userRepository.findByEmailIgnoreCase(registrationRequest.getEmail())).thenReturn(Optional.empty());
+        when(clientService.resolveClient(registrationRequest.getClientId())).thenReturn(testClient);
         when(passwordEncoder.encode(registrationRequest.getPassword())).thenReturn("hashedPassword123");
         when(userRepository.save(any(User.class))).thenReturn(testUser);
 
@@ -76,6 +91,7 @@ class UserServiceTest {
         // Assert
         assertNotNull(response);
         assertEquals(testUser.getId(), response.getUserId());
+        assertEquals(testClient.getId(), response.getClientId());
         assertEquals(testUser.getUsername(), response.getUsername());
         assertEquals(testUser.getEmail(), response.getEmail());
         assertEquals("Registration successful. Please verify your email.", response.getMessage());

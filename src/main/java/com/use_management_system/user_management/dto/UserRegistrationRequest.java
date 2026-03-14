@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+import java.util.UUID;
+
 public class UserRegistrationRequest {
 
     @NotBlank(message = "username is required")
@@ -19,6 +21,8 @@ public class UserRegistrationRequest {
 
     @NotBlank(message = "fullName is required")
     private String fullName;
+
+    private UUID clientId;
 
     public UserRegistrationRequest() {
     }
@@ -60,5 +64,13 @@ public class UserRegistrationRequest {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
+    }
+
+    public UUID getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(UUID clientId) {
+        this.clientId = clientId;
     }
 }

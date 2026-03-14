@@ -20,6 +20,10 @@ public class Session {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
     @Column(nullable = false, unique = true)
     private String sessionToken;
 
@@ -58,6 +62,14 @@ public class Session {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public String getSessionToken() {

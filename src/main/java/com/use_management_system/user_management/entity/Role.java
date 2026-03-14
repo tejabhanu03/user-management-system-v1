@@ -19,6 +19,10 @@ public class Role {
     @Column(nullable = false, unique = true)
     private String roleName;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "client_id", nullable = false)
+    private Client client;
+
     @Column(columnDefinition = "TEXT")
     private String description;
 
@@ -48,6 +52,14 @@ public class Role {
 
     public void setRoleName(String roleName) {
         this.roleName = roleName;
+    }
+
+    public Client getClient() {
+        return client;
+    }
+
+    public void setClient(Client client) {
+        this.client = client;
     }
 
     public String getDescription() {

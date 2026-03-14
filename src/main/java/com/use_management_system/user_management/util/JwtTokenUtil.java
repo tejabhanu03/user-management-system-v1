@@ -48,6 +48,7 @@ public class JwtTokenUtil {
                 .setExpiration(Date.from(expiry))
                 .setIssuer(issuer)
                 .setAudience(audience)
+                .claim("clientId", userContext.getClientId() == null ? null : userContext.getClientId().toString())
                 .claim("username", userContext.getUsername())
                 .claim("roles", userContext.getRoles())
                 .claim("permissions", userContext.getPermissions())
@@ -65,6 +66,7 @@ public class JwtTokenUtil {
         Claims claims = jws.getBody();
 
         String subject = claims.getSubject();
+        String clientId = claims.get("clientId", String.class);
         String username = claims.get("username", String.class);
 
         @SuppressWarnings("unchecked")
@@ -75,10 +77,10 @@ public class JwtTokenUtil {
 
         return new UserContextDto(
                 UUID.fromString(subject),
+                clientId == null ? null : UUID.fromString(clientId),
                 username,
                 roles,
                 permissions
         );
     }
 }
-

@@ -26,7 +26,12 @@ public class PermissionController {
         try {
             String permissionName = request.get("permissionName");
             String description = request.get("description");
-            Permission permission = permissionService.createPermission(permissionName, description);
+            String clientId = request.get("clientId");
+            Permission permission = permissionService.createPermission(
+                    permissionName,
+                    description,
+                    clientId == null ? null : UUID.fromString(clientId)
+            );
             return ResponseEntity.status(HttpStatus.CREATED).body(permission);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

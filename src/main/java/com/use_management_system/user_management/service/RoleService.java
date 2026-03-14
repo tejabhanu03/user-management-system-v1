@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.Role;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.entity.UserRole;
@@ -17,23 +18,28 @@ public class RoleService {
     private final RoleRepository roleRepository;
     private final UserRepository userRepository;
     private final UserRoleRepository userRoleRepository;
+    private final ClientService clientService;
 
     public RoleService(RoleRepository roleRepository,
                        UserRepository userRepository,
-                       UserRoleRepository userRoleRepository) {
+                       UserRoleRepository userRoleRepository,
+                       ClientService clientService) {
         this.roleRepository = roleRepository;
         this.userRepository = userRepository;
         this.userRoleRepository = userRoleRepository;
+        this.clientService = clientService;
     }
 
-    public Role createRole(String roleName, String description) {
+    public Role createRole(String roleName, String description, UUID clientId) {
         if (roleRepository.findByRoleName(roleName).isPresent()) {
             throw new RuntimeException("Role already exists");
         }
 
         Role role = new Role();
+        Client client = clientService.resolveClient(clientId);
         role.setRoleName(roleName);
         role.setDescription(description);
+        role.setClient(client);
         role.setActive(true);
 
         return roleRepository.save(role);

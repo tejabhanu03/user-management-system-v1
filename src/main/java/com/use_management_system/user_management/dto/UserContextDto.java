@@ -6,6 +6,7 @@ import java.util.UUID;
 public class UserContextDto {
 
     private UUID userId;
+    private UUID clientId;
     private String username;
     private List<String> roles;
     private List<String> permissions;
@@ -13,8 +14,9 @@ public class UserContextDto {
     public UserContextDto() {
     }
 
-    public UserContextDto(UUID userId, String username, List<String> roles, List<String> permissions) {
+    public UserContextDto(UUID userId, UUID clientId, String username, List<String> roles, List<String> permissions) {
         this.userId = userId;
+        this.clientId = clientId;
         this.username = username;
         this.roles = roles;
         this.permissions = permissions;
@@ -26,6 +28,14 @@ public class UserContextDto {
 
     public void setUserId(UUID userId) {
         this.userId = userId;
+    }
+
+    public UUID getClientId() {
+        return clientId;
+    }
+
+    public void setClientId(UUID clientId) {
+        this.clientId = clientId;
     }
 
     public String getUsername() {
@@ -52,4 +62,3 @@ public class UserContextDto {
         this.permissions = permissions;
     }
 }
-

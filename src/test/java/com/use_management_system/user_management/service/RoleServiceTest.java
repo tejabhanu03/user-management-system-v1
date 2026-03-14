@@ -1,5 +1,6 @@
 package com.use_management_system.user_management.service;
 
+import com.use_management_system.user_management.entity.Client;
 import com.use_management_system.user_management.entity.Role;
 import com.use_management_system.user_management.entity.User;
 import com.use_management_system.user_management.entity.UserRole;
@@ -35,29 +36,42 @@ class RoleServiceTest {
     @Mock
     private UserRoleRepository userRoleRepository;
 
+    @Mock
+    private ClientService clientService;
+
     @InjectMocks
     private RoleService roleService;
 
     private UUID roleId;
     private UUID userId;
+    private UUID clientId;
     private Role testRole;
     private User testUser;
+    private Client testClient;
 
     @BeforeEach
     void setUp() {
         roleId = UUID.randomUUID();
         userId = UUID.randomUUID();
+        clientId = UUID.randomUUID();
+
+        testClient = new Client();
+        testClient.setId(clientId);
+        testClient.setClientName("DEFAULT_CLIENT");
+        testClient.setIsEnabled(true);
 
         testRole = new Role();
         testRole.setId(roleId);
         testRole.setRoleName("ADMIN");
         testRole.setDescription("Administrator role");
+        testRole.setClient(testClient);
         testRole.setActive(true);
 
         testUser = new User();
         testUser.setId(userId);
         testUser.setUsername("testuser");
         testUser.setEmail("test@example.com");
+        testUser.setClient(testClient);
         testUser.setActive(true);
     }
 
@@ -65,10 +79,11 @@ class RoleServiceTest {
     void testCreateRoleSuccess() {
         // Arrange
         when(roleRepository.findByRoleName("ADMIN")).thenReturn(Optional.empty());
+        when(clientService.resolveClient(null)).thenReturn(testClient);
         when(roleRepository.save(any(Role.class))).thenReturn(testRole);
 
         // Act
-        Role createdRole = roleService.createRole("ADMIN", "Administrator role");
+        Role createdRole = roleService.createRole("ADMIN", "Administrator role", null);
 
         // Assert
         assertNotNull(createdRole);
@@ -77,6 +92,7 @@ class RoleServiceTest {
         assertTrue(createdRole.getActive());
 
         verify(roleRepository, times(1)).findByRoleName("ADMIN");
+        verify(clientService, times(1)).resolveClient(null);
         verify(roleRepository, times(1)).save(any(Role.class));
     }
 
@@ -87,7 +103,7 @@ class RoleServiceTest {
 
         // Act & Assert
         RuntimeException exception = assertThrows(RuntimeException.class,
-            () -> roleService.createRole("ADMIN", "Administrator role"));
+            () -> roleService.createRole("ADMIN", "Administrator role", null));
         assertEquals("Role already exists", exception.getMessage());
 
         verify(roleRepository, times(1)).findByRoleName("ADMIN");
@@ -348,4 +364,3 @@ class RoleServiceTest {
         verify(userRoleRepository, never()).findByUserAndActive(any(), any());
     }
 }
-

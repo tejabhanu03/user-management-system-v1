@@ -26,7 +26,12 @@ public class RoleController {
         try {
             String roleName = request.get("roleName");
             String description = request.get("description");
-            Role role = roleService.createRole(roleName, description);
+            String clientId = request.get("clientId");
+            Role role = roleService.createRole(
+                    roleName,
+                    description,
+                    clientId == null ? null : UUID.fromString(clientId)
+            );
             return ResponseEntity.status(HttpStatus.CREATED).body(role);
         } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();

@@ -1,0 +1,207 @@
+# Figma Spec - User Journey (Client-Specific SaaS)
+
+## Goal
+Design a complete user journey using current APIs:
+1. Client onboarding context
+2. User registration
+3. Email verification
+4. Login
+5. Post-login app shell with left navigation
+6. User can view profile, roles, and permissions
+
+## Information Architecture
+- Public
+  - Welcome
+  - Register
+  - Verify Email (link target)
+  - Login
+  - Resend Verification
+- Authenticated App Shell
+  - Left Nav
+    - Profile
+    - Roles
+    - Permissions
+    - Sessions (optional extension)
+
+## Figma File Structure
+- Page 1: `00_Flow`
+- Page 2: `01_Wireframes`
+- Page 3: `02_High_Fidelity`
+- Page 4: `03_Components`
+- Page 5: `04_Prototype`
+
+## 00_Flow (use connector arrows)
+### Main Path
+1. `Welcome` -> `Register`
+2. `Register` -> `Registration Success (Check Email)`
+3. `Email Link` -> `Verify Email Success`
+4. `Verify Email Success` -> `Login`
+5. `Login Success` -> `App Shell / Profile`
+6. `Profile` <-> `Roles` <-> `Permissions` via left nav
+
+### Alternate Paths
+- Register -> email already exists
+- Login -> email not verified
+- Verify link -> token expired / invalid
+- Resend verification -> success and rate-limit states
+
+## 01_Wireframes (Desktop first)
+Use frame width 1440.
+
+### Screen WF-01: Welcome
+- Header: product name + Sign In button
+- Body: value proposition + CTA buttons
+  - `Create Account`
+  - `Login`
+
+### Screen WF-02: Register
+Fields:
+- Username
+- Full Name
+- Email
+- Password
+- Client Selector (dropdown / searchable)
+  - Populate from `GET /api/clients`
+Buttons:
+- `Create Account`
+- Secondary link: `Already have an account? Login`
+API:
+- `POST /api/users/register`
+
+### Screen WF-03: Registration Success
+- Message: "Registration successful. Please verify your email."
+- Button: `Go to Login`
+- Link: `Resend verification email`
+
+### Screen WF-04: Verify Email
+States:
+- Loading (when token in query)
+- Success: `GET /api/auth/verify-email?token=...`
+- Error: invalid/expired token
+- CTA: `Go to Login`
+
+### Screen WF-05: Resend Verification
+- Single email field
+- Button: `Resend`
+- Success generic message
+- Rate-limit inline error
+API:
+- `POST /api/auth/resend-verification`
+
+### Screen WF-06: Login
+Fields:
+- Username
+- Password
+Button:
+- `Login`
+Errors:
+- Invalid username/password
+- Email not verified (`EMAIL_VERIFICATION_REQUIRED`)
+API:
+- `POST /api/auth/login`
+
+### Screen WF-07: App Shell (Authenticated)
+Layout:
+- Left nav fixed width 260
+- Top bar with user avatar, username, logout
+- Main content area
+Left Nav items:
+- Profile
+- Roles
+- Permissions
+- Logout
+
+### Screen WF-08: Profile
+Cards:
+- Basic Info (username, full name, email)
+- Account Status (active, email verified)
+- Client Info (clientId and optional client name)
+APIs:
+- Preferred: `GET /api/user-context/me` for identity context
+- Details: `GET /api/users/username/{username}` or `/api/users/{userId}`
+
+### Screen WF-09: Roles
+- Table/list of roles assigned to user
+Columns:
+- Role Name
+- Description
+- Active
+API:
+- `GET /api/roles/user/{userId}`
+
+### Screen WF-10: Permissions
+- Table/list of effective permissions for selected role or user context
+Option A (role based):
+- Select role dropdown, then load permissions
+- API: `GET /api/permissions/role/{roleId}`
+Option B (token context based):
+- Show permissions from `/api/user-context/me`
+
+## 02_High_Fidelity Guidelines
+- Typography:
+  - Headings: 32/24/20
+  - Body: 16
+  - Meta: 14
+- Color roles:
+  - Primary, Secondary, Success, Warning, Error, Neutral
+- Form states:
+  - Default, Focus, Error, Disabled
+- Buttons:
+  - Primary (filled), Secondary (outline), Tertiary (text)
+
+## 03_Components Library
+Create reusable components with variants:
+- `NavItem` (default/active/hover)
+- `TextField` (default/error)
+- `PasswordField`
+- `PrimaryButton`, `SecondaryButton`
+- `StatusBadge` (active/inactive, verified/unverified)
+- `DataTable` (empty/loading/error)
+- `Toast` (success/error/info)
+- `AuthCard`
+
+## 04_Prototype Interactions
+- Register submit -> Success screen
+- Verify success -> Login
+- Login success -> App Shell/Profile
+- Left nav click transitions:
+  - Profile -> Roles -> Permissions
+- Error overlays for:
+  - unverified login
+  - verification token expired
+
+## API-to-Screen Binding
+- Client list: `GET /api/clients`
+- Register: `POST /api/users/register`
+- Verify: `GET /api/auth/verify-email`
+- Resend: `POST /api/auth/resend-verification`
+- Login: `POST /api/auth/login`
+- User context: `GET /api/user-context/me`
+- Profile details: `GET /api/users/{userId}` or `GET /api/users/username/{username}`
+- User roles: `GET /api/roles/user/{userId}`
+- Role permissions: `GET /api/permissions/role/{roleId}`
+
+## UX Notes for Current Backend Behavior
+- Registration returns success and requires email verification.
+- Login may fail with email verification required.
+- Resend endpoint returns generic success message for security.
+- JWT now carries `clientId`; show it in profile context section.
+
+## Suggested Frame Names
+- `WF-01_Welcome`
+- `WF-02_Register`
+- `WF-03_Register_Success`
+- `WF-04_Verify_Email`
+- `WF-05_Resend_Verification`
+- `WF-06_Login`
+- `WF-07_AppShell`
+- `WF-08_Profile`
+- `WF-09_Roles`
+- `WF-10_Permissions`
+
+## Copy Snippets
+- Register success: `Registration successful. Please verify your email.`
+- Resend success: `If an account exists for this email, a verification link has been sent.`
+- Unverified login error: `Email not verified. Please verify before login.`
+- Verify success: `Email verified successfully.`
+- Verify expired: `Verification link expired. Request a new link.`

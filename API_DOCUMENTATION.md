@@ -13,6 +13,19 @@ http://localhost:8080/api
 ### Home
 - **GET** `/` - Welcome message and version info
 
+## Dashboard Statistics
+
+### Overview Statistics
+- **GET** `/statistics/overview`
+- Description: Returns summary statistics for homepage dashboards.
+- Response:
+```json
+{
+  "onboardedClientsCount": 12,
+  "verifiedUsersCount": 248
+}
+```
+
 ## Authentication Endpoints
 
 ### Login
@@ -234,4 +247,3 @@ Error Response:
 - 401 Unauthorized
 - 404 Not Found
 - 500 Internal Server Error
-
